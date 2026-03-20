@@ -79,9 +79,59 @@ function playTone(freq, duration = 0.08, type = "sine") {
   }
 }
 
-function playSuccess() {
+/** Krátké pípnutí po správném prvním kroku (most na desítku). */
+function playStepSuccess() {
   playTone(523, 0.06);
   window.setTimeout(() => playTone(659, 0.08), 70);
+}
+
+/**
+ * Delší veselá „fanfára“ po dokončení celého příkladu (spolu s animací / confetti).
+ */
+function playCelebration() {
+  if (!isSoundOn()) return;
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    const now = ctx.currentTime;
+    /** @type {{ f: number; t: number; d: number }[]} */
+    const notes = [
+      { f: 523.25, t: 0, d: 0.11 },
+      { f: 659.25, t: 0.09, d: 0.11 },
+      { f: 783.99, t: 0.18, d: 0.11 },
+      { f: 1046.5, t: 0.3, d: 0.22 },
+      { f: 1318.51, t: 0.48, d: 0.18 },
+    ];
+
+    notes.forEach(({ f, t, d }) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.value = f;
+      const start = now + t;
+      const end = start + d;
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.13, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.06, start + d * 0.45);
+      gain.gain.exponentialRampToValueAtTime(0.0001, end);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(start);
+      osc.stop(end + 0.02);
+    });
+
+    const lastNoteEndSec = 0.48 + 0.18 + 0.05;
+    window.setTimeout(() => {
+      try {
+        ctx.close();
+      } catch {
+        /* ignore */
+      }
+    }, lastNoteEndSec * 1000 + 80);
+  } catch {
+    /* ignore */
+  }
 }
 
 function playSoft() {
@@ -219,9 +269,9 @@ function onCheck() {
     wrongStreak = 0;
     el.feedback.textContent = "Přesně tak!";
     el.feedback.className = "feedback feedback--ok";
-    playSuccess();
 
     if (phase === 1) {
+      playStepSuccess();
       el.midLabel.textContent = `Jsme na kulatém čísle: ${problem.mid}`;
       el.midLabel.classList.remove("hidden");
       renderNumberBlocks(el.blocks, problem.mid);
@@ -233,6 +283,7 @@ function onCheck() {
       return;
     }
 
+    playCelebration();
     renderNumberBlocks(el.blocks, problem.result);
     celebrateBlocks(el.blocks);
     phase = "done";
