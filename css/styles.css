@@ -44,6 +44,83 @@ body {
   padding: 0.75rem 1rem 2rem;
 }
 
+/* Větší rozhraní (MacBook 13–15", externí monitor) */
+@media (min-width: 900px) {
+  html {
+    font-size: 112.5%;
+  }
+
+  .app {
+    max-width: 880px;
+    padding: 1rem 1.35rem 2.25rem;
+  }
+
+  .card {
+    padding: 1.5rem 1.65rem 1.75rem;
+  }
+
+  .brand {
+    font-size: 1.25rem;
+  }
+
+  .problem-text {
+    font-size: clamp(2rem, 3.8vw, 2.85rem);
+  }
+
+  .step-hint {
+    font-size: 1.08rem;
+  }
+
+  .field-label {
+    font-size: 1.08rem;
+  }
+
+  .step-input {
+    font-size: 1.5rem;
+    width: 5.25rem;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .btn {
+    padding: 0.85rem 1.5rem;
+    min-height: 52px;
+  }
+
+  .feedback {
+    font-size: 1.06rem;
+  }
+
+  .mid-label {
+    font-size: 1.2rem;
+  }
+
+  .block {
+    width: 26px;
+    height: 26px;
+  }
+
+  .blocks-area {
+    min-height: 140px;
+  }
+
+  .recipe {
+    padding: 0.85rem 1.15rem;
+  }
+
+  .recipe__steps {
+    font-size: 1.02rem;
+  }
+
+  .anchor-panel {
+    font-size: 1.02rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .toolbar-toggle {
+    font-size: 0.98rem;
+  }
+}
+
 .top-bar {
   display: flex;
   align-items: center;
@@ -225,30 +302,56 @@ body {
 }
 
 .recipe {
+  width: 100%;
+  max-width: 100%;
   margin: 0 0 1rem;
-  padding: 0.65rem 0.85rem;
+  padding: 0.75rem 1rem;
   background: rgba(155, 138, 184, 0.12);
   border-radius: var(--radius-sm);
   border: 1px solid rgba(155, 138, 184, 0.35);
+  box-sizing: border-box;
 }
 
-.recipe__summary {
+/* Výchozí <summary> je list-item — bere místo mimo box; sjednotíme šířku a zarovnání */
+.recipe > .recipe__summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
   font-weight: 800;
   cursor: pointer;
   color: var(--lavender);
-  list-style-position: outside;
+  list-style: none;
 }
 
-.recipe__summary::-webkit-details-marker {
+.recipe > .recipe__summary::-webkit-details-marker,
+.recipe > .recipe__summary::marker {
+  display: none;
+}
+
+.recipe > .recipe__summary::before {
+  content: "▸";
+  flex: 0 0 auto;
+  width: 1.15em;
+  text-align: center;
+  line-height: 1.35;
   color: var(--lavender);
+  transition: transform 0.2s ease;
+}
+
+.recipe[open] > .recipe__summary::before {
+  content: "▾";
 }
 
 .recipe__steps {
-  margin: 0.5rem 0 0;
-  padding-left: 1.2rem;
-  font-size: 0.95rem;
+  margin: 0.55rem 0 0;
+  padding-left: 1.35rem;
+  padding-right: 0.25rem;
+  font-size: 0.98rem;
   color: var(--text);
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
 .recipe__steps li {
