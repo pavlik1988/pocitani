@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Procvičování počítání přes desítku do stovky — interaktivní pomůcka." />
+  <title>Přes desítku — počítání</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body>
+  <div id="app" class="app">
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand__icon" aria-hidden="true">
+          <svg class="mascot-mini" viewBox="0 0 48 48" width="36" height="36">
+            <circle cx="24" cy="26" r="14" fill="#7c6f9e" />
+            <circle cx="18" cy="22" r="3" fill="#fff8f0" />
+            <circle cx="30" cy="22" r="3" fill="#fff8f0" />
+            <circle cx="18" cy="22" r="1.5" fill="#2d2a32" />
+            <circle cx="30" cy="22" r="1.5" fill="#2d2a32" />
+            <ellipse cx="24" cy="30" rx="3" ry="2" fill="#ffb4a8" />
+            <path d="M8 12 Q24 4 40 12 L38 16 Q24 10 10 16 Z" fill="#9b8ab8" />
+          </svg>
+        </span>
+        <span class="brand__text">Přes desítku</span>
+      </div>
+      <label class="sound-toggle">
+        <input type="checkbox" id="sound-enabled" />
+        <span>Zvuky</span>
+      </label>
+    </header>
+
+    <main class="main">
+      <!-- Welcome -->
+      <section id="screen-welcome" class="screen screen--welcome" aria-labelledby="welcome-title">
+        <div class="welcome-card card">
+          <div class="welcome-mascot" aria-hidden="true">
+            <svg class="mascot" viewBox="0 0 120 120" width="100" height="100">
+              <ellipse cx="60" cy="95" rx="28" ry="8" fill="#c4b5d8" opacity="0.5" />
+              <circle cx="60" cy="55" r="38" fill="#8b7cae" />
+              <path d="M22 38 Q60 8 98 38 L92 48 Q60 28 28 48 Z" fill="#a896c8" />
+              <circle cx="44" cy="50" r="10" fill="#fff8f0" />
+              <circle cx="76" cy="50" r="10" fill="#fff8f0" />
+              <circle cx="46" cy="52" r="4" fill="#2d2a32" />
+              <circle cx="78" cy="52" r="4" fill="#2d2a32" />
+              <ellipse cx="60" cy="72" rx="10" ry="6" fill="#ffb4a8" />
+              <path id="mascot-smile" d="M48 68 Q60 78 72 68" fill="none" stroke="#2d2a32" stroke-width="2.5" stroke-linecap="round" />
+            </svg>
+          </div>
+          <h1 id="welcome-title" class="title">Ahoj! Spočítáme to spolu</h1>
+          <p class="lead">Naučíme se skákat na <strong>kulatá čísla</strong> — nejdřív doplníme desítku, pak zbytek. Vyber obtížnost:</p>
+          <div class="level-grid">
+            <button type="button" class="level-btn card card--level" data-level="1">
+              <span class="level-btn__badge">1</span>
+              <span class="level-btn__title">Do dvaceti</span>
+              <span class="level-btn__desc">Jen sčítání, malá čísla</span>
+            </button>
+            <button type="button" class="level-btn card card--level" data-level="2">
+              <span class="level-btn__badge">2</span>
+              <span class="level-btn__title">Větší čísla</span>
+              <span class="level-btn__desc">Sčítání i odčítání</span>
+            </button>
+            <button type="button" class="level-btn card card--level" data-level="3">
+              <span class="level-btn__badge">3</span>
+              <span class="level-btn__title">Až do stovky</span>
+              <span class="level-btn__desc">Stejné triky, větší čísla</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Game -->
+      <section id="screen-game" class="screen screen--game hidden" aria-live="polite">
+        <div class="game-toolbar">
+          <button type="button" id="btn-change-level" class="btn btn--ghost">Změnit úroveň</button>
+        </div>
+
+        <div class="game-card card">
+          <p id="problem-text" class="problem-text" aria-live="assertive">—</p>
+          <p id="step-hint" class="step-hint">—</p>
+
+          <div id="blocks-area" class="blocks-area" aria-label="Obrázek čísla"></div>
+          <p id="mid-label" class="mid-label hidden" aria-live="polite"></p>
+
+          <div id="step-panel" class="step-panel">
+            <label id="step-label" for="step-input" class="field-label">Kolik přičteme jako první?</label>
+            <div class="step-row">
+              <input type="number" id="step-input" class="step-input" inputmode="numeric" min="0" max="99" autocomplete="off" />
+              <button type="button" id="btn-check" class="btn btn--primary">Zkusit</button>
+            </div>
+            <button type="button" id="btn-hint" class="btn btn--ghost btn--small">Nápověda</button>
+          </div>
+
+          <p id="feedback" class="feedback" role="status"></p>
+
+          <div id="actions-done" class="actions-done hidden">
+            <button type="button" id="btn-next" class="btn btn--primary">Další příklad</button>
+            <button type="button" id="btn-again" class="btn btn--secondary">Stejný znovu</button>
+          </div>
+        </div>
+
+        <div id="confetti" class="confetti" aria-hidden="true"></div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
