@@ -238,9 +238,15 @@ body {
   gap: 0.85rem;
 }
 
-@media (min-width: 540px) {
+@media (min-width: 520px) {
   .level-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 960px) {
+  .level-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 

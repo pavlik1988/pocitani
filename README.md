@@ -1,6 +1,6 @@
 # Přes desítku — interaktivní pomůcka
 
-Jednoduchá statická webová aplikace v češtině pro procvičování **počítání přes desítku** (most na kulaté číslo) u čísel do 100. Vhodné pro děti kolem 2. třídy.
+Jednoduchá statická webová aplikace v češtině pro procvičování **počítání přes desítku** (most na kulaté číslo) u čísel do 100 a **odčítání dvojciferných čísel** postupně (např. 25 − 13 = nejdřív −10, pak −3). Vhodné pro děti kolem 2. třídy.
 
 ## Živá verze
 
@@ -50,7 +50,7 @@ git push -u origin main
 |-----------------|------|
 | [index.html](index.html) | Struktura stránky, obrazovky |
 | [css/styles.css](css/styles.css) | Vzhled, pastelová paleta |
-| [js/problems.js](js/problems.js) | Generování příkladů podle úrovně |
+| [js/problems.js](js/problems.js) | Generování příkladů (úrovně 1–3: most přes desítku; **4**: dvojciferné − dvojciferné, rozklad odčítance) |
 | [js/render.js](js/render.js) | Vizualizace desítek a jednotek |
 | [js/app.js](js/app.js) | Krok za krokem, nápovědy, zvuk |
 

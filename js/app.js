@@ -41,7 +41,26 @@ const el = {
   btnChangeLevel: document.getElementById("btn-change-level"),
   confetti: document.getElementById("confetti"),
   gameCard: document.querySelector(".screen--game .game-card"),
+  recipeSteps: document.getElementById("recipe-steps"),
 };
+
+/** @param {Problem} p */
+function isSplitSub(p) {
+  return p.strategy === "splitSub";
+}
+
+function syncRecipeToLevel() {
+  if (!el.recipeSteps) return;
+  if (level === 4) {
+    el.recipeSteps.innerHTML =
+      "<li><strong>Rozlož</strong> druhé číslo na <strong>desítky a jednotky</strong> (např. 13 = 10 + 3).</li>" +
+      "<li>Nejdřív <strong>odečti celé desítky</strong> z druhého čísla (10, 20…), pak <strong>jednotky</strong>.</li>";
+  } else {
+    el.recipeSteps.innerHTML =
+      "<li><strong>Doplň</strong> nebo <strong>sjeď</strong> na nejbližší <strong>kulaté číslo</strong> (desítku).</li>" +
+      "<li><strong>Přičti</strong> nebo <strong>odečti</strong> zbytek.</li>";
+  }
+}
 
 function isSoundOn() {
   return el.sound.checked;
@@ -99,6 +118,25 @@ function updateAnchorPanel() {
   el.anchorPanel.classList.remove("hidden");
   const frag = document.createDocumentFragment();
 
+  if (isSplitSub(problem)) {
+    const b10 = Math.floor(problem.b / 10) * 10;
+    const b1 = problem.b % 10;
+    if (phase === 1) {
+      const p1 = document.createElement("p");
+      p1.textContent = `Odčítáš ${problem.b} = ${b10} + ${b1}.`;
+      frag.appendChild(p1);
+      const p2 = document.createElement("p");
+      p2.textContent = `V prvním kroku odečti celé desítky najednou → odečti ${b10}.`;
+      frag.appendChild(p2);
+    } else {
+      const p1 = document.createElement("p");
+      p1.textContent = `Jsme na ${problem.mid}. Z druhého čísla ještě zbývá odečíst jednotky: ${b1}.`;
+      frag.appendChild(p1);
+    }
+    el.anchorPanel.replaceChildren(frag);
+    return;
+  }
+
   if (phase === 1) {
     const u = problem.a % 10;
     const p1 = document.createElement("p");
@@ -145,6 +183,43 @@ function formatHint(tier) {
   if (!problem) return { text: "", className: base };
   const p = problem;
   const head = (n) => `Nápověda ${n}/3: `;
+
+  if (isSplitSub(p)) {
+    if (tier === 1) {
+      if (phase === 1) {
+        return {
+          text: `${head(1)}Číslo ${p.b} rozlož na desítky a jednotky (např. 13 = 10 + 3). V prvním kroku odečti všechny celé desítky z druhého čísla najednou (10, 20… podle toho, jak je číslo velké).`,
+          className: base,
+        };
+      }
+      return {
+        text: `${head(1)}Druhý krok: odečti ještě jednotky z druhého čísla. Kolik jich v ${p.b} zbývá po tom, co už jsme odečetli desítky?`,
+        className: base,
+      };
+    }
+    if (tier === 2) {
+      if (phase === 1) {
+        return {
+          text: `${head(2)}Po prvním kroku chceme být na čísle ${p.mid}. Kolik musíš odečíst od ${p.a}, aby to vyšlo?`,
+          className: base,
+        };
+      }
+      return {
+        text: `${head(2)}Hledáme výsledek ${p.result}. Kolik ještě odečteš od ${p.mid}?`,
+        className: base,
+      };
+    }
+    if (phase === 1) {
+      return {
+        text: `${head(3)}Odečti přesně ${p.step1}. Dostaneš ${p.mid}.`,
+        className: base,
+      };
+    }
+    return {
+      text: `${head(3)}Odečti ještě ${p.step2}. Úplný výsledek je ${p.result}.`,
+      className: base,
+    };
+  }
 
   if (tier === 1) {
     if (phase === 1) {
@@ -298,6 +373,15 @@ function problemToString(p) {
 
 function updateStepLabels() {
   if (!problem) return;
+  if (isSplitSub(problem)) {
+    if (phase === 1) {
+      el.stepLabel.textContent =
+        "Kolik jako první odečteme? (celé desítky z druhého čísla — u 13 je to 10, u 26 je to 20)";
+    } else if (phase === 2) {
+      el.stepLabel.textContent = "Kolik ještě odečteme? (jednotky z druhého čísla)";
+    }
+    return;
+  }
   if (phase === 1) {
     el.stepLabel.textContent =
       problem.op === "+"
@@ -311,6 +395,15 @@ function updateStepLabels() {
 
 function setStepHint() {
   if (!problem) return;
+  if (isSplitSub(problem)) {
+    if (phase === 1) {
+      el.stepHint.textContent =
+        "Druhé číslo rozlož na desítky + jednotky. Začni odečtením všech desítek (10, 20…) najednou.";
+    } else {
+      el.stepHint.textContent = "Teď odečti zbývající jednotky z druhého čísla.";
+    }
+    return;
+  }
   if (phase === 1) {
     el.stepHint.textContent =
       problem.op === "+"
@@ -362,6 +455,7 @@ function startProblem(p) {
   el.stepInput.disabled = false;
   el.btnCheck.disabled = false;
   el.problemText.textContent = problemToString(p);
+  syncRecipeToLevel();
   updateStepLabels();
   setStepHint();
   renderNumberBlocks(el.blocks, p.a);
@@ -408,7 +502,9 @@ function onCheck() {
 
     if (phase === 1) {
       playStepSuccess();
-      el.midLabel.textContent = `Jsme na kulatém čísle: ${problem.mid}`;
+      el.midLabel.textContent = isSplitSub(problem)
+        ? `Odečetli jsme ${problem.step1}. Teď máme ${problem.mid}.`
+        : `Jsme na kulatém čísle: ${problem.mid}`;
       el.midLabel.classList.remove("hidden");
       renderNumberBlocks(el.blocks, problem.mid);
       phase = 2;
@@ -450,7 +546,9 @@ function onCheck() {
     return;
   }
   el.feedback.textContent =
-    "Ještě to není ono — zkus to znovu; k nejbližší desítce tě navede i tlačítko Nápověda (tři stupně).";
+    problem && isSplitSub(problem)
+      ? "Ještě to není ono — u 25 − 13 nejdřív odečti celé desítky z druhého čísla (10, 20…), pak jednotky. Nápověda má tři stupně."
+      : "Ještě to není ono — zkus to znovu; k nejbližší desítce tě navede i tlačítko Nápověda (tři stupně).";
   el.feedback.className = "feedback feedback--err";
 }
 
@@ -458,7 +556,7 @@ function bindUi() {
   document.querySelectorAll(".level-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       const lv = Number(btn.getAttribute("data-level"));
-      if (lv >= 1 && lv <= 3) {
+      if (lv >= 1 && lv <= 4) {
         level = /** @type {Level} */ (lv);
         showScreen("game");
         newProblem();

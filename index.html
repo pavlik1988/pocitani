@@ -52,7 +52,7 @@
           </div>
           <p class="greeting">Ahoj Vanessko! Jsem rád, že tě tu vidím, užijeme si spoustu zábavy <span class="greeting__heart" aria-label="srdíčko">❤️</span></p>
           <h1 id="welcome-title" class="title">Spočítáme to spolu</h1>
-          <p class="lead">Naučíme se skákat na <strong>kulatá čísla</strong> — nejdřív doplníme desítku, pak zbytek. Vyber obtížnost:</p>
+          <p class="lead">Naučíme se skákat na <strong>kulatá čísla</strong> a také <strong>rozkládat</strong> druhé číslo u odčítání. Vyber obtížnost:</p>
           <div class="level-grid">
             <button type="button" class="level-btn card card--level" data-level="1">
               <span class="level-btn__badge">1</span>
@@ -67,7 +67,12 @@
             <button type="button" class="level-btn card card--level" data-level="3">
               <span class="level-btn__badge">3</span>
               <span class="level-btn__title">Až do stovky</span>
-              <span class="level-btn__desc">Stejné triky, větší čísla</span>
+              <span class="level-btn__desc">Most přes desítku</span>
+            </button>
+            <button type="button" class="level-btn card card--level" data-level="4">
+              <span class="level-btn__badge">4</span>
+              <span class="level-btn__title">Dvojčísla − dvojčísla</span>
+              <span class="level-btn__desc">Třeba 25 − 13: nejdřív 10, pak jednotky</span>
             </button>
           </div>
         </div>
@@ -86,8 +91,8 @@
         <div class="game-card card">
           <details class="recipe" open>
             <summary class="recipe__summary">Jak na to — náš recept</summary>
-            <ol class="recipe__steps">
-              <li><strong>Doplň</strong> na nejbližší <strong>kulaté číslo</strong> (desítku).</li>
+            <ol id="recipe-steps" class="recipe__steps">
+              <li><strong>Doplň</strong> nebo <strong>sjeď</strong> na nejbližší <strong>kulaté číslo</strong> (desítku).</li>
               <li><strong>Přičti</strong> nebo <strong>odečti</strong> zbytek.</li>
             </ol>
           </details>
