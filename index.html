@@ -58,21 +58,25 @@
               <span class="level-btn__badge">1</span>
               <span class="level-btn__title">Do dvaceti</span>
               <span class="level-btn__desc">Jen sčítání, malá čísla</span>
+              <span class="level-btn__example">Např. <strong>8 + 5</strong>: nejdřív <strong>+2</strong> → 10, pak <strong>+3</strong> → 13.</span>
             </button>
             <button type="button" class="level-btn card card--level" data-level="2">
               <span class="level-btn__badge">2</span>
               <span class="level-btn__title">Větší čísla</span>
               <span class="level-btn__desc">Sčítání i odčítání</span>
+              <span class="level-btn__example">Např. <strong>27 + 6</strong>: +3 → 30, +3 → 33. Nebo <strong>43 − 7</strong>: −3 → 40, −4 → 36.</span>
             </button>
             <button type="button" class="level-btn card card--level" data-level="3">
               <span class="level-btn__badge">3</span>
               <span class="level-btn__title">Až do stovky</span>
               <span class="level-btn__desc">Most přes desítku</span>
+              <span class="level-btn__example">Stejný trik jako u 2, jen větší čísla — třeba <strong>56 + 8</strong> nebo <strong>71 − 6</strong>.</span>
             </button>
             <button type="button" class="level-btn card card--level" data-level="4">
               <span class="level-btn__badge">4</span>
               <span class="level-btn__title">Dvojčísla − dvojčísla</span>
-              <span class="level-btn__desc">Třeba 25 − 13: nejdřív 10, pak jednotky</span>
+              <span class="level-btn__desc">Jiná strategie než u 2 a 3</span>
+              <span class="level-btn__example">Např. <strong>25 − 13</strong>: nejdřív <strong>−10</strong> → 15, pak <strong>−3</strong> → 12.</span>
             </button>
           </div>
         </div>
@@ -89,6 +93,16 @@
         </div>
 
         <div class="game-card card">
+          <div id="level-banner" class="level-banner" aria-live="polite">
+            <div class="level-banner__row">
+              <span id="level-pill" class="level-pill">Úroveň 1</span>
+              <span id="strategy-badge" class="strategy-badge strategy-badge--add">Sčítání · most</span>
+            </div>
+            <p id="level-goal-text" class="level-banner__goal">
+              Trénink: u malých součtů nejdřív doplníme na 10, pak přičteme zbytek.
+            </p>
+          </div>
+
           <details class="recipe" open>
             <summary class="recipe__summary">Jak na to — náš recept</summary>
             <ol id="recipe-steps" class="recipe__steps">

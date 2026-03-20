@@ -42,7 +42,48 @@ const el = {
   confetti: document.getElementById("confetti"),
   gameCard: document.querySelector(".screen--game .game-card"),
   recipeSteps: document.getElementById("recipe-steps"),
+  levelPill: document.getElementById("level-pill"),
+  strategyBadge: document.getElementById("strategy-badge"),
+  levelGoalText: document.getElementById("level-goal-text"),
 };
+
+function updateLevelBanner() {
+  if (!el.levelPill || !el.strategyBadge || !el.levelGoalText) return;
+
+  /** @type {Record<number, { pill: string; badge: string; badgeClass: string; goal: string }>} */
+  const cfg = {
+    1: {
+      pill: "Úroveň 1",
+      badge: "Sčítání · most",
+      badgeClass: "strategy-badge--add",
+      goal: "Trénink: u malých součtů nejdřív doplníme na 10, pak přičteme zbytek.",
+    },
+    2: {
+      pill: "Úroveň 2",
+      badge: "Most přes desítku",
+      badgeClass: "strategy-badge--bridge",
+      goal: "Trénink: u větších čísel nejdřív skočíme na kulaté číslo, pak přičteme nebo odečteme jednu cifru.",
+    },
+    3: {
+      pill: "Úroveň 3",
+      badge: "Most přes desítku",
+      badgeClass: "strategy-badge--bridge",
+      goal: "Trénink: stejný postup až do stovky — nejdřív kulaté číslo, pak druhý krok s jednou cifrou.",
+    },
+    4: {
+      pill: "Úroveň 4",
+      badge: "Rozklad druhého čísla",
+      badgeClass: "strategy-badge--split",
+      goal: "Trénink: u odčítání typu 25 − 13 nejdřív odečteme celé desítky z druhého čísla (10, 20…), pak jednotky — jinak než u úrovní 2 a 3.",
+    },
+  };
+
+  const c = cfg[level] ?? cfg[1];
+  el.levelPill.textContent = c.pill;
+  el.strategyBadge.textContent = c.badge;
+  el.strategyBadge.className = `strategy-badge ${c.badgeClass}`;
+  el.levelGoalText.textContent = c.goal;
+}
 
 /** @param {Problem} p */
 function isSplitSub(p) {
@@ -455,6 +496,7 @@ function startProblem(p) {
   el.stepInput.disabled = false;
   el.btnCheck.disabled = false;
   el.problemText.textContent = problemToString(p);
+  updateLevelBanner();
   syncRecipeToLevel();
   updateStepLabels();
   setStepHint();
