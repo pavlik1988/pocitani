@@ -97,10 +97,14 @@ function syncRecipeToLevel() {
     el.recipeSteps.innerHTML =
       "<li><strong>Rozlož</strong> druhé číslo na <strong>desítky a jednotky</strong> (např. 13 = 10 + 3).</li>" +
       "<li>Nejdřív <strong>odečti celé desítky</strong> z druhého čísla (10, 20…), pak <strong>jednotky</strong>.</li>";
+  } else if (level === 1) {
+    el.recipeSteps.innerHTML =
+      "<li>U <strong>sčítání</strong> jdi <strong>nahoru</strong> na nejbližší <strong>kulaté číslo</strong> (desítku).</li>" +
+      "<li>Pak <strong>přičti</strong> zbytek.</li>";
   } else {
     el.recipeSteps.innerHTML =
-      "<li><strong>Doplň</strong> nebo <strong>sjeď</strong> na nejbližší <strong>kulaté číslo</strong> (desítku).</li>" +
-      "<li><strong>Přičti</strong> nebo <strong>odečti</strong> zbytek.</li>";
+      "<li>U <strong>sčítání</strong> jdi <strong>nahoru</strong> na nejbližší kulaté číslo, u <strong>odčítání</strong> <strong>dolů</strong> na nejbližší kulaté číslo (desítku).</li>" +
+      "<li>Pak <strong>přičti</strong> nebo <strong>odečti</strong> zbytek.</li>";
   }
 }
 
