@@ -104,6 +104,17 @@ body {
   filter: drop-shadow(0 6px 12px rgba(139, 124, 174, 0.35));
 }
 
+.greeting {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-dark);
+  margin: 0 0 0.35rem;
+  line-height: 1.35;
+  max-width: 28rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .title {
   font-size: clamp(1.5rem, 4vw, 1.85rem);
   font-weight: 800;
