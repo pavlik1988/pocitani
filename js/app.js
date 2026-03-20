@@ -29,6 +29,7 @@ const el = {
   stepHint: document.getElementById("step-hint"),
   blocks: document.getElementById("blocks-area"),
   midLabel: document.getElementById("mid-label"),
+  bPartsPanel: document.getElementById("b-parts-panel"),
   stepLabel: document.getElementById("step-label"),
   stepInput: document.getElementById("step-input"),
   btnCheck: document.getElementById("btn-check"),
@@ -412,6 +413,84 @@ function problemToString(p) {
   return `${p.a} ${sym} ${p.b}`;
 }
 
+/** Zobrazí rozklad druhého čísla b ve 2. kroku — „už spotřebováno“ vs „zbývá“. */
+function updateBPartsPanel() {
+  if (!el.bPartsPanel) return;
+  if (!problem || phase !== 2) {
+    el.bPartsPanel.classList.add("hidden");
+    el.bPartsPanel.replaceChildren();
+    return;
+  }
+
+  el.bPartsPanel.classList.remove("hidden");
+  const wrap = document.createElement("div");
+  wrap.className = "b-parts-panel__inner";
+
+  const pText = document.createElement("p");
+  pText.className = "b-parts-panel__text";
+
+  const bar = document.createElement("div");
+  bar.className = "b-parts-bar";
+  bar.setAttribute("role", "group");
+
+  const mkChunk = (value, done, labelShort) => {
+    const span = document.createElement("span");
+    span.className = done
+      ? "b-parts-bar__chunk b-parts-bar__chunk--done"
+      : "b-parts-bar__chunk b-parts-bar__chunk--todo";
+    span.style.flex = String(Math.max(1, value));
+    const num = document.createElement("strong");
+    num.textContent = String(value);
+    span.appendChild(num);
+    const lab = document.createElement("span");
+    lab.className = "b-parts-bar__label";
+    lab.textContent = labelShort;
+    span.appendChild(lab);
+    return span;
+  };
+
+  if (isSplitSub(problem)) {
+    const b10 = Math.floor(problem.b / 10) * 10;
+    const b1 = problem.b % 10;
+    pText.innerHTML = `Druhé číslo je <strong>${problem.b}</strong> = <strong>${b10}</strong> + <strong>${b1}</strong>. <strong>Celé desítky</strong> už máme v prvním kroku odečtené. Teď jde jen o <strong>jednotky</strong> — zbývá odečíst <strong>${b1}</strong>.`;
+    bar.setAttribute(
+      "aria-label",
+      `Druhé číslo rozloženo: ${b10} už odečteno, zbývá ${b1}`,
+    );
+    bar.append(
+      mkChunk(b10, true, "už −"),
+      mkChunk(b1, false, "teď"),
+    );
+  } else if (problem.op === "+") {
+    pText.innerHTML = `Ke druhému číslu <strong>${problem.b}</strong> přičítáme po částech: už jsme přičetli <strong>${problem.step1}</strong>, ze „druhé strany“ příkladu zbývá přičíst ještě <strong>${problem.step2}</strong>.`;
+    bar.setAttribute(
+      "aria-label",
+      `Přičítáme ${problem.b}: část ${problem.step1} hotová, zbývá ${problem.step2}`,
+    );
+    bar.append(
+      mkChunk(problem.step1, true, "už +"),
+      mkChunk(problem.step2, false, "teď +"),
+    );
+  } else {
+    pText.innerHTML = `Od druhého čísla <strong>${problem.b}</strong> odečítáme po částech: už jsme odečetli <strong>${problem.step1}</strong>, z <strong>toho samého</strong> druhého čísla zbývá odečíst ještě <strong>${problem.step2}</strong>.`;
+    bar.setAttribute(
+      "aria-label",
+      `Odčítáme ${problem.b}: část ${problem.step1} hotová, zbývá ${problem.step2}`,
+    );
+    bar.append(
+      mkChunk(problem.step1, true, "už −"),
+      mkChunk(problem.step2, false, "teď −"),
+    );
+  }
+
+  const leg = document.createElement("p");
+  leg.className = "b-parts-panel__legend";
+  leg.textContent = "Vlevo už hotový kousek druhého čísla, vpravo to, co řešíš teď.";
+
+  wrap.append(pText, bar, leg);
+  el.bPartsPanel.replaceChildren(wrap);
+}
+
 function updateStepLabels() {
   if (!problem) return;
   if (isSplitSub(problem)) {
@@ -502,6 +581,7 @@ function startProblem(p) {
   setStepHint();
   renderNumberBlocks(el.blocks, p.a);
   updateAnchorPanel();
+  updateBPartsPanel();
   el.stepInput.focus();
 }
 
@@ -556,6 +636,7 @@ function onCheck() {
       updateStepLabels();
       setStepHint();
       updateAnchorPanel();
+      updateBPartsPanel();
       el.stepInput.focus();
       return;
     }
@@ -567,6 +648,7 @@ function onCheck() {
     el.stepPanel.classList.add("hidden");
     el.actionsDone.classList.remove("hidden");
     el.stepHint.textContent = `Výsledek: ${problem.result} — skvělá práce!`;
+    updateBPartsPanel();
     spawnConfetti();
     if (el.gameCard) {
       el.gameCard.classList.add("mascot-bounce");
