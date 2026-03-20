@@ -77,13 +77,26 @@
       <section id="screen-game" class="screen screen--game hidden" aria-live="polite">
         <div class="game-toolbar">
           <button type="button" id="btn-change-level" class="btn btn--ghost">Změnit úroveň</button>
+          <label class="toolbar-toggle">
+            <input type="checkbox" id="anchor-toggle" />
+            <span>Pomoc s jednotkami</span>
+          </label>
         </div>
 
         <div class="game-card card">
+          <details class="recipe" open>
+            <summary class="recipe__summary">Jak na to — náš recept</summary>
+            <ol class="recipe__steps">
+              <li><strong>Doplň</strong> na nejbližší <strong>kulaté číslo</strong> (desítku).</li>
+              <li><strong>Přičti</strong> nebo <strong>odečti</strong> zbytek.</li>
+            </ol>
+          </details>
+
           <p id="problem-text" class="problem-text" aria-live="assertive">—</p>
           <p id="step-hint" class="step-hint">—</p>
 
           <div id="blocks-area" class="blocks-area" aria-label="Obrázek čísla"></div>
+          <div id="anchor-panel" class="anchor-panel hidden" aria-live="polite"></div>
           <p id="mid-label" class="mid-label hidden" aria-live="polite"></p>
 
           <div id="step-panel" class="step-panel">
@@ -92,7 +105,9 @@
               <input type="number" id="step-input" class="step-input" inputmode="numeric" min="0" max="99" autocomplete="off" />
               <button type="button" id="btn-check" class="btn btn--primary">Zkusit</button>
             </div>
-            <button type="button" id="btn-hint" class="btn btn--ghost btn--small">Nápověda</button>
+            <button type="button" id="btn-hint" class="btn btn--ghost btn--small" title="Každé kliknutí ukáže silnější nápovědu (až 3 stupně)">
+              Nápověda
+            </button>
           </div>
 
           <p id="feedback" class="feedback" role="status"></p>

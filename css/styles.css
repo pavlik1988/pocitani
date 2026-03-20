@@ -199,7 +199,87 @@ body {
 
 /* Game */
 .game-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem 1rem;
   margin-bottom: 0.75rem;
+}
+
+.toolbar-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.toolbar-toggle input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--lavender);
+}
+
+.recipe {
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.85rem;
+  background: rgba(155, 138, 184, 0.12);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(155, 138, 184, 0.35);
+}
+
+.recipe__summary {
+  font-weight: 800;
+  cursor: pointer;
+  color: var(--lavender);
+  list-style-position: outside;
+}
+
+.recipe__summary::-webkit-details-marker {
+  color: var(--lavender);
+}
+
+.recipe__steps {
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.45;
+}
+
+.recipe__steps li {
+  margin-bottom: 0.25rem;
+}
+
+.anchor-panel {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  background: rgba(126, 207, 192, 0.15);
+  border: 1px solid rgba(74, 158, 143, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.anchor-panel.hidden {
+  display: none;
+}
+
+.anchor-panel p {
+  margin: 0.25rem 0;
+}
+
+.anchor-panel p:first-child {
+  margin-top: 0;
+}
+
+.anchor-panel p:last-child {
+  margin-bottom: 0;
 }
 
 .problem-text {
@@ -393,6 +473,11 @@ body {
 
 .feedback--err {
   color: var(--accent-dark);
+}
+
+.feedback--tip {
+  color: #3d6b8a;
+  font-weight: 700;
 }
 
 .actions-done {

@@ -5,6 +5,7 @@ import { renderNumberBlocks, celebrateBlocks } from "./render.js";
 /** @typedef {import('./problems.js').Level} Level */
 
 const STORAGE_SOUND = "pocitani-sound";
+const STORAGE_ANCHOR = "pocitani-anchor";
 
 /** @type {'welcome'|'game'} */
 let screen = "welcome";
@@ -15,11 +16,15 @@ let problem = null;
 /** @type {1|2|'done'} */
 let phase = 1;
 let wrongStreak = 0;
+/** Nejvyšší stupeň nápovědy odkrytý v aktuálním kroku (1–3). */
+let hintTier = 0;
 
 const el = {
   welcome: document.getElementById("screen-welcome"),
   game: document.getElementById("screen-game"),
   sound: document.getElementById("sound-enabled"),
+  anchorToggle: document.getElementById("anchor-toggle"),
+  anchorPanel: document.getElementById("anchor-panel"),
   problemText: document.getElementById("problem-text"),
   stepHint: document.getElementById("step-hint"),
   blocks: document.getElementById("blocks-area"),
@@ -56,6 +61,148 @@ function saveSoundPref() {
   } catch {
     /* ignore */
   }
+}
+
+function loadAnchorPref() {
+  if (!el.anchorToggle) return;
+  try {
+    el.anchorToggle.checked = localStorage.getItem(STORAGE_ANCHOR) === "1";
+  } catch {
+    el.anchorToggle.checked = false;
+  }
+}
+
+function saveAnchorPref() {
+  if (!el.anchorToggle) return;
+  try {
+    localStorage.setItem(STORAGE_ANCHOR, el.anchorToggle.checked ? "1" : "0");
+  } catch {
+    /* ignore */
+  }
+}
+
+/** @param {number} n */
+function jednotkySlovo(n) {
+  if (n === 1) return "jednotka";
+  if (n >= 2 && n <= 4) return "jednotky";
+  return "jednotek";
+}
+
+function updateAnchorPanel() {
+  if (!el.anchorPanel || !el.anchorToggle) return;
+  if (!el.anchorToggle.checked || !problem || phase === "done") {
+    el.anchorPanel.classList.add("hidden");
+    el.anchorPanel.replaceChildren();
+    return;
+  }
+
+  el.anchorPanel.classList.remove("hidden");
+  const frag = document.createDocumentFragment();
+
+  if (phase === 1) {
+    const u = problem.a % 10;
+    const p1 = document.createElement("p");
+    p1.textContent = `V čísle ${problem.a} je na konci ${u} ${jednotkySlovo(u)}.`;
+    frag.appendChild(p1);
+    const p2 = document.createElement("p");
+    if (problem.op === "+") {
+      const need = 10 - u;
+      p2.textContent =
+        need === 10
+          ? "U jednotek už jsi na začátku „desítky“ — pokračuj podle příkladu."
+          : `Do další desítky nahoru chybí přičíst ${need}.`;
+    } else {
+      p2.textContent =
+        u === 0
+          ? "Zkus sjet na nejbližší menší desítku."
+          : `Na nejbližší menší desítku odečteš z jednotek ${u} (na 0 v jednotkách).`;
+    }
+    frag.appendChild(p2);
+  } else {
+    const cur = problem.mid;
+    const u2 = cur % 10;
+    const p1 = document.createElement("p");
+    p1.textContent = `Teď jsme na čísle ${cur} — v jednotkách je ${u2} ${jednotkySlovo(u2)}.`;
+    frag.appendChild(p1);
+    const p2 = document.createElement("p");
+    p2.textContent = `Druhé číslo v příkladu je ${problem.b}. Ve druhém kroku ho „doženeš“ k výsledku.`;
+    frag.appendChild(p2);
+  }
+
+  el.anchorPanel.replaceChildren(frag);
+}
+
+function resetHintTier() {
+  hintTier = 0;
+}
+
+/**
+ * @param {1|2|3} tier
+ * @returns {{ text: string; className: string }}
+ */
+function formatHint(tier) {
+  const base = "feedback feedback--tip";
+  if (!problem) return { text: "", className: base };
+  const p = problem;
+  const head = (n) => `Nápověda ${n}/3: `;
+
+  if (tier === 1) {
+    if (phase === 1) {
+      if (p.op === "+") {
+        return {
+          text: `${head(1)}Nejdřív hledej kulaté číslo nad číslem, kde právě jsi. Spočítej, kolik musíš přičíst, abys na něj skočila.`,
+          className: base,
+        };
+      }
+      return {
+        text: `${head(1)}Nejdřív sjeď na kulaté číslo pod číslem, kde právě jsi. Spočítej, kolik jednotek dolů odečteš.`,
+        className: base,
+      };
+    }
+    return {
+      text: `${head(1)}Teď druhý krok: kolik ještě přičítáš nebo odečítáš z druhého čísla v příkladu?`,
+      className: base,
+    };
+  }
+
+  if (tier === 2) {
+    if (phase === 1) {
+      if (p.op === "+") {
+        return {
+          text: `${head(2)}Zkus se dostat na číslo ${p.mid}. Kolik k tomu potřebuješ přičíst?`,
+          className: base,
+        };
+      }
+      return {
+        text: `${head(2)}Zkus se dostat na číslo ${p.mid}. Kolik k tomu potřebuješ odečíst?`,
+        className: base,
+      };
+    }
+    return {
+      text: `${head(2)}Hledáme výsledek ${p.result}. Kolik ještě přičteš nebo odečteš ve druhém kroku?`,
+      className: base,
+    };
+  }
+
+  const target = phase === 1 ? p.mid : p.result;
+  const verb = p.op === "+" ? "Přičti" : "Odečti";
+  if (phase === 1) {
+    return {
+      text: `${head(3)}${verb} přesně ${p.step1}. Dostaneš ${target}.`,
+      className: base,
+    };
+  }
+  return {
+    text: `${head(3)}${verb} ještě ${p.step2}. Úplný výsledek je ${p.result}.`,
+    className: base,
+  };
+}
+
+/** @param {1|2|3} tier */
+function renderHintContent(tier) {
+  const { text, className } = formatHint(tier);
+  el.feedback.textContent = text;
+  el.feedback.className = className;
 }
 
 function playTone(freq, duration = 0.08, type = "sine") {
@@ -205,6 +352,7 @@ function startProblem(p) {
   problem = p;
   phase = 1;
   wrongStreak = 0;
+  resetHintTier();
   clearFeedback();
   el.midLabel.classList.add("hidden");
   el.midLabel.textContent = "";
@@ -217,34 +365,22 @@ function startProblem(p) {
   updateStepLabels();
   setStepHint();
   renderNumberBlocks(el.blocks, p.a);
+  updateAnchorPanel();
   el.stepInput.focus();
 }
 
 function newProblem() {
   if (!level) return;
   const p = randomProblem(level);
-  startProblem(p, false);
+  startProblem(p);
 }
 
-function showHint() {
-  if (!problem) return;
-  wrongStreak += 1;
-  if (wrongStreak >= 2) {
-    const target = phase === 1 ? problem.mid : problem.result;
-    const verb = problem.op === "+" ? "přičti" : "odečti";
-    el.feedback.textContent =
-      phase === 1
-        ? `Nápověda: ${verb} přesně ${phase === 1 ? problem.step1 : problem.step2}. Dostaneš ${target}.`
-        : `Nápověda: ${verb} ještě ${problem.step2}. Výsledek je ${problem.result}.`;
-    el.feedback.className = "feedback feedback--err";
-    playSoft();
-    return;
-  }
-  el.feedback.textContent =
-    phase === 1
-      ? "Zkus: kolik chybí jednotkám do další desítky? (Nebo kolik jednotek musíš odečíst dolů.)"
-      : "Kolik zbývá z druhého čísla po prvním kroku?";
-  el.feedback.className = "feedback";
+function showHintFromButton() {
+  if (!problem || phase === "done") return;
+  const next = Math.min(3, hintTier + 1);
+  hintTier = next;
+  renderHintContent(next);
+  playSoft();
 }
 
 function onCheck() {
@@ -276,9 +412,12 @@ function onCheck() {
       el.midLabel.classList.remove("hidden");
       renderNumberBlocks(el.blocks, problem.mid);
       phase = 2;
+      wrongStreak = 0;
+      resetHintTier();
       el.stepInput.value = "";
       updateStepLabels();
       setStepHint();
+      updateAnchorPanel();
       el.stepInput.focus();
       return;
     }
@@ -300,13 +439,19 @@ function onCheck() {
 
   wrongStreak += 1;
   playSoft();
-  el.feedback.className = "feedback feedback--err";
+  if (wrongStreak >= 3) {
+    hintTier = Math.max(hintTier, 3);
+    renderHintContent(3);
+    return;
+  }
   if (wrongStreak >= 2) {
-    showHint();
+    hintTier = Math.max(hintTier, 2);
+    renderHintContent(2);
     return;
   }
   el.feedback.textContent =
-    "Ještě to není ono — přemýšlej, kolik potřebuješ k nejbližší desítce. Můžeš použít Nápovědu.";
+    "Ještě to není ono — zkus to znovu; k nejbližší desítce tě navede i tlačítko Nápověda (tři stupně).";
+  el.feedback.className = "feedback feedback--err";
 }
 
 function bindUi() {
@@ -331,8 +476,15 @@ function bindUi() {
   });
 
   el.btnHint.addEventListener("click", () => {
-    showHint();
+    showHintFromButton();
   });
+
+  if (el.anchorToggle) {
+    el.anchorToggle.addEventListener("change", () => {
+      saveAnchorPref();
+      updateAnchorPanel();
+    });
+  }
 
   el.btnNext.addEventListener("click", () => {
     newProblem();
@@ -347,6 +499,7 @@ function bindUi() {
 
 function init() {
   loadSoundPref();
+  loadAnchorPref();
   bindUi();
   showScreen("welcome");
 }
